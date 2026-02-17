@@ -5,7 +5,7 @@
 : ${COMMANDER_MODEL:="llama-3.3-70b-versatile"}
 
 log_error() {
-  print "$1" >&2
+  print -P $1 >&2
 }
 
 if [[ -z "$GROQ_API_KEY" ]]; then
@@ -50,15 +50,10 @@ EOF
 )
 
   local response
-  response=$(curl -sS "https://api.groq.com/openai/v1/chat/completions" \
+  response=$(curl -s "https://api.groq.com/openai/v1/chat/completions" \
     -H "Authorization: Bearer ${GROQ_API_KEY}" \
     -H "Content-Type: application/json" \
-    -d "$payload" 2>&1)
-
-  if [[ $? -ne 0 ]]; then
-    printf '%s' "$response"
-    return 1
-  fi
+    -d "$payload" 2>/dev/null)
 
   local error
   error=$(printf '%s' "$response" | jq -r '.error // empty')
@@ -93,13 +88,13 @@ _commander_widget() {
     return
   fi
 
-  zle -I
-
   local saved_buffer="$BUFFER"
   local saved_cursor="$CURSOR"
 
+  zle -I
+
   local input
-  input=$(gum input --prompt "ai> " --placeholder "describe a command..." --width 0 --no-show-help)
+  input=$(gum input --prompt "ai> " --placeholder "describe a command..." --width 0)
 
   if [[ $? -ne 0 || -z "$input" ]]; then
     BUFFER="$saved_buffer"
@@ -114,10 +109,11 @@ _commander_widget() {
   result=$(_commander_query "$input")
 
   if [[ $? -ne 0 ]]; then
+    print -r -- $'\r'"commander: ${result}"
     BUFFER="$saved_buffer"
     CURSOR="$saved_cursor"
+    sleep 2
     zle reset-prompt
-    zle -M "commander: ${result}"
     return
   fi
 
