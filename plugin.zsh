@@ -37,7 +37,7 @@ _commander_query() {
   "messages": [
     {
       "role": "system",
-      "content": "You are a shell command generator. Given a natural language description, output ONLY the shell command - no explanation, no markdown, no code fences. The user's shell is zsh on linux."
+      "content": "You are a shell command generator. Given a natural language description, output ONLY the shell command - no explanation, no markdown, no code fences. The user's shell is ${SHELL##*/} on $(uname -s)."
     },
     {
       "role": "user",

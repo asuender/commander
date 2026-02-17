@@ -1,6 +1,6 @@
 # commander
 
-A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language request, and get an AI-generated shell command inserted directly into your command line. Pure ZSH + curl + jq + gum, powered by Groq to make that experience as fast as possible.
+A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language request, and get an AI-generated shell command inserted directly into your command line. Pure ZSH + curl + jq + gum, powered by Groq to make that experience as fast as possible. It also recognizes the current OS and shell in use. 
 
 ## Prerequisites
 
