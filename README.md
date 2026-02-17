@@ -1,12 +1,13 @@
 # commander
 
-A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language request, and get an AI-generated shell command inserted directly into your command line. Pure ZSH + curl + jq, powered by Groq.
+A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language request, and get an AI-generated shell command inserted directly into your command line. Pure ZSH + curl + jq + gum, powered by Groq.
 
 ## Prerequisites
 
 - `zsh`
 - `curl`
 - `jq`
+- [`gum`](https://github.com/charmbracelet/gum)
 - A [Groq API key](https://console.groq.com/)
 
 ## Installation
@@ -35,7 +36,7 @@ A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language req
 4. Press **Ctrl+C** or **Ctrl+G** to abort
 5. Review the command, edit if needed, then press **Enter** to execute
 
-The input prompt is a full ZLE recursive edit session, so all your usual ZSH line editing keybindings work (arrow keys, word movement, etc.). Syntax highlighting and autosuggestions are temporarily disabled during input.
+The input prompt is powered by [gum](https://github.com/charmbracelet/gum), so it renders cleanly below your shell prompt without interfering with ZSH syntax highlighting or autosuggestions.
 
 ## Configuration
 

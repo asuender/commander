@@ -16,6 +16,10 @@ if ! command -v jq &>/dev/null; then
   print -P "jq is required but not found." >&2
 fi
 
+if ! command -v gum &>/dev/null; then
+  print -P "gum is required but not found." >&2
+fi
+
 _commander_query() {
   local user_input="$1"
 
@@ -75,55 +79,44 @@ _commander_widget() {
     return
   fi
 
-  local saved_buffer="$BUFFER"
-  local saved_cursor="$CURSOR"
-
-  PREDISPLAY="${saved_buffer}"$'\n'"ai> "
-  BUFFER=""
-  CURSOR=0
-
-  # temporarily disable all highlighters to avoid any
-  # colors in the user input
-  local saved_highlighters=("${ZSH_HIGHLIGHT_HIGHLIGHTERS[@]}")
-  ZSH_HIGHLIGHT_HIGHLIGHTERS=()
-  local saved_suggestion_strategy="${ZSH_AUTOSUGGEST_STRATEGY}"
-  unset ZSH_AUTOSUGGEST_STRATEGY
-
-  zle recursive-edit
-
-  local ret=$?
-  local input="$BUFFER"
-
-  ZSH_HIGHLIGHT_HIGHLIGHTERS=("${saved_highlighters[@]}")
-  ZSH_AUTOSUGGEST_STRATEGY="$saved_suggestion_strategy"
-
-  if [[ $ret -ne 0 || -z "$input" ]]; then
-    PREDISPLAY=""
-    BUFFER="$saved_buffer"
-    CURSOR="$saved_cursor"
+  if ! command -v gum &>/dev/null; then
+    zle -M "commander: gum is required but not found"
     return
   fi
 
-  PREDISPLAY="${saved_buffer}"$'\n'"ai> "
-  BUFFER="generating..."
-  CURSOR=${#BUFFER}
-  zle redisplay
+  local saved_buffer="$BUFFER"
+  local saved_cursor="$CURSOR"
+
+  zle -I
+
+  local input
+  input=$(gum input --prompt "ai> " --placeholder "describe a command..." --width 0)
+
+  if [[ $? -ne 0 || -z "$input" ]]; then
+    BUFFER="$saved_buffer"
+    CURSOR="$saved_cursor"
+    zle reset-prompt
+    return
+  fi
+
+  print -n "ai> generating..."
 
   local result
   result=$(_commander_query "$input")
 
-  PREDISPLAY=""
-
   if [[ $? -ne 0 || "$result" == ERROR:* ]]; then
     local err_msg="${result#ERROR: }"
-    zle -M "commander: ${err_msg}"
+    print "\rai> error: ${err_msg}"
+    sleep 2
     BUFFER="$saved_buffer"
     CURSOR="$saved_cursor"
+    zle reset-prompt
     return
   fi
 
   BUFFER="$result"
   CURSOR=${#BUFFER}
+  zle reset-prompt
 }
 
 zle -N commander _commander_widget
