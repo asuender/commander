@@ -24,6 +24,25 @@ if ! command -v gum &>/dev/null; then
   log_error "gum is required but not found."
 fi
 
+# Detect useful CLI tools available in the user's environment.
+# Runs once at plugin load time (once per ZSH session).
+_commander_tools=(
+  rg fd bat eza fzf zoxide sd delta hyperfine
+  tldr dust duf procs btm tokei xh
+)
+
+_COMMANDER_AVAILABLE_TOOLS=""
+for _cmd in "${_commander_tools[@]}"; do
+  if command -v "$_cmd" &>/dev/null; then
+    if [[ -n "$_COMMANDER_AVAILABLE_TOOLS" ]]; then
+      _COMMANDER_AVAILABLE_TOOLS+=", $_cmd"
+    else
+      _COMMANDER_AVAILABLE_TOOLS="$_cmd"
+    fi
+  fi
+done
+unset _cmd _commander_tools
+
 _commander_query() {
   local user_input="$1"
 
@@ -37,7 +56,7 @@ _commander_query() {
   "messages": [
     {
       "role": "system",
-      "content": "You are a shell command generator. Given a natural language description, output ONLY the shell command - no explanation, no markdown, no code fences. The user's shell is ${SHELL##*/} on $(uname -s)."
+      "content": "You are a shell command generator. Given a natural language description, output ONLY the shell command - no explanation, no markdown, no code fences. The user's shell is ${SHELL##*/} on $(uname -s).${_COMMANDER_AVAILABLE_TOOLS:+ Prefer these available tools when relevant: ${_COMMANDER_AVAILABLE_TOOLS}.}"
     },
     {
       "role": "user",

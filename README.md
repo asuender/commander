@@ -6,7 +6,7 @@ A minimal ZSH widget that lets you press **Ctrl+G**, type a natural language req
 
 - `zsh`
 - `curl`
-- `jq`
+- [`jq`](https://jqlang.org/)
 - [`gum`](https://github.com/charmbracelet/gum)
 - A [Groq API key](https://console.groq.com/)
 
